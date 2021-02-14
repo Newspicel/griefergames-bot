@@ -1,5 +1,5 @@
 node_modules/
-sessions/*
+launcher_profiles.json
 tests/
 .vscode/
 tslint.json

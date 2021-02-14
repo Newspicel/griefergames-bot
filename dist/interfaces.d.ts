@@ -1,12 +1,12 @@
 export interface Options {
     username?: string;
     password?: string;
-    mcLeaksToken?: string;
-    cacheSessions?: boolean;
+    auth?: 'mojang' | 'microsoft' | 'mcleaks';
     logMessages?: boolean | LogMessagesOptions;
     additionalChatDelay?: number;
     solveAfkChallenge?: boolean;
     setPortalTimeout?: boolean;
+    profilesFolder?: string | false;
 }
 export interface LogMessagesOptions {
     type: 'uncoded' | 'encoded' | 'ansi';

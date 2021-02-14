@@ -26,14 +26,13 @@
   "license": "MIT",
   "dependencies": {
     "minecraft-protocol": "git+https://github.com/Neocraftr/node-minecraft-protocol.git",
-    "mineflayer": "^2.28.1",
+    "mineflayer": "^2.40.1",
     "mineflayer-navigate-promise": "^0.2.0",
-    "mojang": "^2.2.2",
     "vec3": "^0.1.7"
   },
   "devDependencies": {
-    "@types/node": "^10.17.32",
-    "cross-env": "^7.0.2",
+    "@types/node": "^10.17.50",
+    "cross-env": "^7.0.3",
     "prettier": "^1.19.1",
     "typescript": "^3.9.7"
   }

@@ -11,6 +11,7 @@ export declare const config: {
     SLOWCHAT_ALERT_REGEXP: RegExp;
     COMMANDSPAM_ALERT_REGEXP: RegExp;
     PAY_REGXP: RegExp;
+    MONEYDROP_REGEXP: RegExp;
     REDSTONE_REGEXP: RegExp;
     ITEMCLEAR_REGEXP: RegExp;
     MOBREMOVER_REGEXP: RegExp;

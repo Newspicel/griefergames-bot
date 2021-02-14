@@ -2,13 +2,13 @@ export interface Options {
   username?: string;
   password?: string;
   // for mcleaks my fork of minecraft-protocol (https://github.com/Neocraftr/node-minecraft-protocol) is needed
-  mcLeaksToken?: string;
-  cacheSessions?: boolean;
+  auth?: 'mojang' | 'microsoft' | 'mcleaks';
   logMessages?: boolean | LogMessagesOptions;
   additionalChatDelay?: number;
   solveAfkChallenge?: boolean;
   setPortalTimeout?: boolean;
   // proxy?: Proxy
+  profilesFolder?: string | false;
 }
 
 export interface LogMessagesOptions {

@@ -9,16 +9,15 @@ const mineflayer_navigate_promise_1 = __importDefault(require("mineflayer-naviga
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const events_1 = require("events");
-const sessionHandler_1 = require("./sessionHandler");
 const enums_1 = require("./enums");
 const config_1 = require("./config");
 const connector_1 = require("./tasks/connector");
 const solve_afk_challenge_1 = require("./tasks/solve-afk-challenge");
 const minecraftUtil_1 = require("./util/minecraftUtil");
 const defaultOptions = {
-    cacheSessions: true,
     setPortalTimeout: true,
-    solveAfkChallenge: true
+    solveAfkChallenge: true,
+    profilesFolder: path_1.default.join(__dirname, '../')
 };
 class Bot extends events_1.EventEmitter {
     constructor(options) {
@@ -38,21 +37,12 @@ class Bot extends events_1.EventEmitter {
             port: config_1.config.SERVER_PORT,
             version: 1.8,
             checkTimeoutInterval: 30000,
-            logErrors: false
+            logErrors: false,
+            auth: this.options.auth,
+            profilesFolder: this.options.profilesFolder,
+            username: this.options.username,
+            password: this.options.password
         };
-        if (this.options.cacheSessions && !this.options.mcLeaksToken) {
-            try {
-                botOptions.session = await sessionHandler_1.getValidSession(this.options.username, this.options.password);
-            }
-            catch (e) {
-                throw e;
-            }
-        }
-        else {
-            botOptions.username = this.options.username;
-            botOptions.password = this.options.password;
-            botOptions.mcLeaksToken = this.options.mcLeaksToken;
-        }
         this.client = mineflayer_1.default.createBot(botOptions);
         this.registerEvents();
         this.installPlugins();
@@ -150,6 +140,7 @@ class Bot extends events_1.EventEmitter {
         this.client.chatAddPattern(config_1.config.REDSTONE_REGEXP, 'redstoneAlert');
         this.client.chatAddPattern(config_1.config.TPA_REGEXP, 'tpa');
         this.client.chatAddPattern(config_1.config.TPAHERE_REGEXP, 'tpahere');
+        this.client.chatAddPattern(config_1.config.MONEYDROP_REGEXP, 'moneydrop');
         this.client.on('msg', (rank, username, message) => {
             this.emit('msg', rank, username, message);
         });
@@ -161,6 +152,9 @@ class Bot extends events_1.EventEmitter {
         });
         this.client.on('tpahere', (rank, username) => {
             this.emit('tpahere', rank, username);
+        });
+        this.client.on('moneydrop', (amount) => {
+            this.emit('moneydrop', parseFloat(amount.replace(/,/g, '')));
         });
         this.client.on('chatModeAlert', (rank, username, change) => {
             switch (change) {

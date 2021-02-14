@@ -46,9 +46,14 @@ Creating a bot:
 const bot = createBot({
   // Authentication with Mojang account
   username: 'email@example.com',
-  password: 'password',
+  password: 'password'
+  // or Microsoft account
+  username: 'email@example.com',
+  password: 'password'
+  auth: 'microsoft'
   // or MCLeaks.net
-  mcLeaksToken: 'token',
+  password: 'token',
+  auth: 'mcleaks'
   
   logMessages: true
 });
