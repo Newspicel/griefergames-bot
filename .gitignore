@@ -4,3 +4,4 @@ tests/
 .vscode/
 tslint.json
 graveyard
+.idea
