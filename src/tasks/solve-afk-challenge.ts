@@ -21,7 +21,7 @@ function waitForClickSlot(bot, slot) {
 }
 
 function waitForCloseWindow(bot) {
-  return new Promise((resolve) => {
+  return new Promise<void>((resolve) => {
     bot.client.once('windowClose', () => {
       resolve();
     });
