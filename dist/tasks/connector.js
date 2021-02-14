@@ -123,11 +123,10 @@ async function run(bot, options) {
     bot.client.setControlState('forward', true);
     await delay(2500);
     bot.client.clearControlStates();
-    const stopWiggle = wiggle(bot);
+    bot.client.setControlState('jump', true);
     await checkIfSpawned();
-    stopWiggle();
-    if (bot.client != null)
-        bot.client.clearControlStates();
+    bot.client.setControlState('jump', false);
+    bot.client.clearControlStates();
     if (bot.options.setPortalTimeout) {
         clearTimeout(timeout);
     }

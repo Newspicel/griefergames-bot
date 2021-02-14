@@ -142,17 +142,18 @@ async function run(bot: Bot, options: ConnectorOptions): Promise<void> {
   await delay(2500);
 
   bot.client.clearControlStates();
-  const stopWiggle = wiggle(bot);
+  bot.client.setControlState('jump', true);
 
   await checkIfSpawned();
 
-  stopWiggle();
-  if(bot.client != null) bot.client.clearControlStates();
+  bot.client.setControlState('jump', false);
+  bot.client.clearControlStates();
   if(bot.options.setPortalTimeout) {
     clearTimeout(timeout);
   }
 }
 
+// @ts-ignore
 function wiggle(bot: Bot): () => void {
   function moveLeft() {
     bot.client.setControlState('left', true);
