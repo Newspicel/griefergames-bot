@@ -23,7 +23,7 @@ Built upon [mineflayer](https://github.com/PrismarineJS/mineflayer).
 
 ## Installation
 ```bash
-npm install https://github.com/Neocraftr/griefergames-bot.git
+npm install https://github.com/Newspicel/griefergames-bot.git
 ```
 
 ## Quick Start
