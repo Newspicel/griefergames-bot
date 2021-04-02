@@ -22,7 +22,7 @@ declare class Bot extends EventEmitter {
     navigateTo(position: any): Promise<void>;
     end(reason?: string): void;
     private setConnectionStatus;
-    private loadConnectorOptions;
+    private static loadConnectorOptions;
     private installPlugins;
     private registerEvents;
     private getTimeSinceLastMessage;

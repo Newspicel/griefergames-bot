@@ -53,25 +53,25 @@ async function run(bot, options) {
     let lookDirection;
     switch (options.start) {
         case 0:
-            startPos = vec3_1.default([323, 117, 281]);
+            startPos = vec3_1.default([323, 67, 281]);
             lookDirection = [CARDINAL_YAWS.SOUTH_WEST, 0];
             break;
         case 1:
-            startPos = vec3_1.default([323, 117, 279]);
+            startPos = vec3_1.default([323, 67, 279]);
             lookDirection = [CARDINAL_YAWS.NORTH_WEST, 0];
             break;
         case 2:
-            startPos = vec3_1.default([327, 117, 279]);
+            startPos = vec3_1.default([327, 67, 279]);
             lookDirection = [CARDINAL_YAWS.NORTH_EAST, 0];
             break;
         case 3:
-            startPos = vec3_1.default([327, 117, 281]);
+            startPos = vec3_1.default([327, 67, 281]);
             lookDirection = [CARDINAL_YAWS.SOUTH_EAST, 0];
             break;
         default:
             throw new Error('Start position not provided! Check path file.');
     }
-    bot.sendCommand('portal');
+    bot.sendCommand('portal').then();
     await waitForSpawn(bot);
     await delay(3000);
     listenForSpawn(bot);

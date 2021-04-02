@@ -56,7 +56,7 @@ class Bot extends events_1.EventEmitter {
     async connectCityBuild(dest) {
         let connectorOptions;
         try {
-            connectorOptions = await this.loadConnectorOptions(dest);
+            connectorOptions = await Bot.loadConnectorOptions(dest);
         }
         catch (e) {
             throw new Error(`There is no CityBuild named '${dest}'.`);
@@ -93,7 +93,7 @@ class Bot extends events_1.EventEmitter {
         this.connectionStatus = status;
         this.emit('connectionStatus', status, old);
     }
-    async loadConnectorOptions(dest) {
+    static async loadConnectorOptions(dest) {
         const file = path_1.default.join(__dirname, `../paths/${dest.trim().toLowerCase()}.json`);
         let connectorOptions;
         try {
@@ -173,7 +173,7 @@ class Bot extends events_1.EventEmitter {
         });
         this.client.on('slowChatAlert', () => {
             this.chatDelay = config_1.config.SLOW_COOLDOWN;
-            this.sendChat('&f', true);
+            this.sendChat('&f', true).then();
             console.warn('Sent messages too quickly!');
         });
         this.client.on('commandSpamAlert', () => {
@@ -213,14 +213,12 @@ class Bot extends events_1.EventEmitter {
             this.emit('windowOpen', window);
             if (this.options.solveAfkChallenge) {
                 let title = JSON.parse(window.title);
-                if (window.type == 'minecraft:container' && title && title.includes('§cAfk?')) {
+                if (window.type == 'minecraft:container' && title && title.includes('§cAFK?')) {
                     solve_afk_challenge_1.solveAfkChallengeTask(this, window)
                         .then(() => {
                         this.emit('solvedAfkChallenge');
                     })
-                        .catch((e) => {
-                        console.error('Failed solving AFK challenge.');
-                    });
+                        .catch(() => console.error('Failed solving AFK challenge.'));
                 }
             }
         });
@@ -241,23 +239,6 @@ class Bot extends events_1.EventEmitter {
         this.client.on('message', (message) => {
             const codedText = minecraftUtil_1.jsonToCodedText(message.json).trim();
             const text = minecraftUtil_1.stripCodes(codedText);
-            if (typeof this.options.logMessages === 'boolean') {
-                if (this.options.logMessages) {
-                    console.log(message.toAnsi());
-                }
-            }
-            else if (typeof this.options.logMessages === 'object') {
-                const logMessagesOptions = this.options.logMessages;
-                if (logMessagesOptions.type === 'uncoded') {
-                    console.log(text);
-                }
-                else if (logMessagesOptions.type === 'encoded') {
-                    console.log(codedText);
-                }
-                else if (logMessagesOptions.type === 'ansi') {
-                    console.log(message.toAnsi());
-                }
-            }
             const fakeCheck = codedText.match(config_1.config.CODED_PAY_REGEXP);
             const payMatches = text.match(config_1.config.PAY_REGXP);
             if (fakeCheck && payMatches && !codedText.includes('§f §ahat dir $')) {
@@ -275,14 +256,41 @@ class Bot extends events_1.EventEmitter {
             catch (e) {
                 msg = new ChatMessage(chatPacket.message);
             }
+            const codedText = minecraftUtil_1.jsonToCodedText(msg.json).trim();
+            const text = minecraftUtil_1.stripCodes(codedText);
+            if (chatPacket.position != 2) {
+                if (typeof this.options.logMessages === 'boolean') {
+                    if (this.options.logMessages) {
+                        console.log(msg.toAnsi());
+                    }
+                }
+                else if (typeof this.options.logMessages === 'object') {
+                    const logMessagesOptions = this.options.logMessages;
+                    if (logMessagesOptions.type === 'uncoded') {
+                        console.log(text);
+                    }
+                    else if (logMessagesOptions.type === 'encoded') {
+                        console.log(codedText);
+                    }
+                    else if (logMessagesOptions.type === 'ansi') {
+                        console.log(msg.toAnsi());
+                    }
+                }
+            }
             this.emit('message', msg, chatPacket.position);
         });
         this.client._client.on('packet', (data, metadata) => {
-            if (metadata.name === 'scoreboard_team' && data.name === 'Kontostandcheck') {
-                this.emit('scoreboardBalance', data.prefix);
+            if (metadata.name === 'scoreboard_team' && data.name === 'money_value') {
+                const currentBalance = data.prefix;
+                if (currentBalance != undefined && currentBalance.trim() != '' && !currentBalance.includes('Laden')) {
+                    this.emit('scoreboardBalance', currentBalance);
+                }
             }
-            if (metadata.name === 'scoreboard_team' && data.name === 'server') {
-                this.emit('scoreboardServer', data.prefix);
+            if (metadata.name === 'scoreboard_team' && data.name === 'server_value') {
+                const serverName = data.prefix.replace(/\u00A7[0-9A-FK-OR]/gi, '');
+                if (serverName != undefined && serverName.trim() != '' && !serverName.includes('Laden')) {
+                    this.emit('scoreboardServer', serverName);
+                }
             }
         });
     }
@@ -383,8 +391,7 @@ function readJsonFile(filePath) {
     });
 }
 function createBot(options) {
-    const bot = new Bot(options);
-    return bot;
+    return new Bot(options);
 }
 exports.createBot = createBot;
 //# sourceMappingURL=bot.js.map
