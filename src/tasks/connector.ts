@@ -97,7 +97,7 @@ async function run(bot: Bot, options: ConnectorOptions): Promise<void> {
       clearTimeout(timeout);
     }
     e.printStackTrace();
-    throw new Error('Stuck in connector.');
+    //throw new Error('Stuck in connector.');
   }
   await delay(500);
 
