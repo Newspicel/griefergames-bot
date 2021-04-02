@@ -96,6 +96,7 @@ async function run(bot: Bot, options: ConnectorOptions): Promise<void> {
     if(bot.options.setPortalTimeout){
       clearTimeout(timeout);
     }
+    e.printStackTrace();
     throw new Error('Stuck in connector.');
   }
   await delay(500);
