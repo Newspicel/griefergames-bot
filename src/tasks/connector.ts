@@ -91,7 +91,7 @@ async function run(bot: Bot, options: ConnectorOptions): Promise<void> {
   listenForSpawn(bot);
 
   try {
-    await bot.client.navigate.promise.to(startPos).then().catch(() => {});
+    await bot.client.navigate.promise.to(startPos).then().catch((error) => {console.log(error)});
   } catch (e) {
     if(bot.options.setPortalTimeout){
       clearTimeout(timeout);
