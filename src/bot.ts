@@ -2,14 +2,14 @@ import mineflayer from 'mineflayer';
 import navigatePlugin from 'mineflayer-navigate-promise';
 import fs from 'fs';
 import path from 'path';
-import { EventEmitter } from 'events';
+import {EventEmitter} from 'events';
 
-import { Session, Options, ConnectorOptions, LogMessagesOptions } from './interfaces';
-import { ChatMode, ConnectionStatus, RedstoneMode } from './enums';
-import { config } from './config';
-import { connectorTask } from './tasks/connector';
-import { solveAfkChallengeTask } from './tasks/solve-afk-challenge';
-import { jsonToCodedText, stripCodes } from './util/minecraftUtil';
+import {ConnectorOptions, LogMessagesOptions, Options, Session} from './interfaces';
+import {ChatMode, ConnectionStatus, RedstoneMode} from './enums';
+import {config} from './config';
+import {connectorTask} from './tasks/connector';
+import {solveAfkChallengeTask} from './tasks/solve-afk-challenge';
+import {jsonToCodedText, stripCodes} from './util/minecraftUtil';
 
 const defaultOptions = {
   setPortalTimeout: true,
@@ -67,7 +67,7 @@ class Bot extends EventEmitter {
   public async connectCityBuild(dest: string): Promise<void> {
     let connectorOptions: ConnectorOptions;
     try {
-      connectorOptions = await this.loadConnectorOptions(dest);
+      connectorOptions = await Bot.loadConnectorOptions(dest);
     } catch (e) {
       throw new Error(`There is no CityBuild named '${dest}'.`);
     }
@@ -113,7 +113,7 @@ class Bot extends EventEmitter {
     this.emit('connectionStatus', status, old);
   }
 
-  private async loadConnectorOptions(dest: string): Promise<ConnectorOptions> {
+  private static async loadConnectorOptions(dest: string): Promise<ConnectorOptions> {
     const file = path.join(__dirname, `../paths/${dest.trim().toLowerCase()}.json`);
 
     let connectorOptions: ConnectorOptions;
@@ -224,7 +224,7 @@ class Bot extends EventEmitter {
       // This can usually happen only
       // shortly after connecting.
       this.chatDelay = config.SLOW_COOLDOWN;
-      this.sendChat('&f', true);
+      this.sendChat('&f', true).then();
       console.warn('Sent messages too quickly!');
     });
 
@@ -276,14 +276,12 @@ class Bot extends EventEmitter {
       if (this.options.solveAfkChallenge) {
         let title = JSON.parse(window.title);
 
-        if (window.type == 'minecraft:container' && title && title.includes('§cAfk?')) {
+        if (window.type == 'minecraft:container' && title && title.includes('§cAFK?')) {
           solveAfkChallengeTask(this, window)
-            .then(() => {
-              this.emit('solvedAfkChallenge');
-            })
-            .catch((e) => {
-              console.error('Failed solving AFK challenge.');
-            });
+              .then(() => {
+                this.emit('solvedAfkChallenge');
+              })
+              .catch(() => console.error('Failed solving AFK challenge.'));
         }
       }
     });
@@ -317,7 +315,7 @@ class Bot extends EventEmitter {
       const codedText = jsonToCodedText(message.json).trim();
       const text = stripCodes(codedText);
 
-      if (typeof this.options.logMessages === 'boolean') {
+      /*if (typeof this.options.logMessages === 'boolean') {
         if (this.options.logMessages) {
           console.log(message.toAnsi());
         }
@@ -332,7 +330,7 @@ class Bot extends EventEmitter {
           console.log(message.toAnsi());
         }
       }
-
+*/
       // Check for fake money
       const fakeCheck = codedText.match(config.CODED_PAY_REGEXP);
       // Get values
@@ -350,23 +348,51 @@ class Bot extends EventEmitter {
     this.client._client.on('chat', chatPacket => {
       let msg;
       try {
-          msg = new ChatMessage(JSON.parse(chatPacket.message))
+        msg = new ChatMessage(JSON.parse(chatPacket.message));
       } catch (e) {
-          msg = new ChatMessage(chatPacket.message)
+        msg = new ChatMessage(chatPacket.message);
       }
+
+      const codedText = jsonToCodedText(msg.json).trim();
+      const text = stripCodes(codedText);
+
+      if (chatPacket.position != 2) {
+        if (typeof this.options.logMessages === 'boolean') {
+          if (this.options.logMessages) {
+            console.log(msg.toAnsi());
+          }
+        } else if (typeof this.options.logMessages === 'object') {
+          const logMessagesOptions = this.options.logMessages as LogMessagesOptions;
+
+          if (logMessagesOptions.type === 'uncoded') {
+            console.log(text);
+          } else if (logMessagesOptions.type === 'encoded') {
+            console.log(codedText);
+          } else if (logMessagesOptions.type === 'ansi') {
+            console.log(msg.toAnsi());
+          }
+        }
+      }
+
       // Positions: 0: chat (chat box), 1: system message (chat box), 2: game info (above hotbar)
       this.emit('message', msg, chatPacket.position);
     });
 
     this.client._client.on('packet', (data: any, metadata: any) => {
       // Emit scoreboard balance updates.
-      if (metadata.name === 'scoreboard_team' && data.name === 'Kontostandcheck') {
-        this.emit('scoreboardBalance', data.prefix);
+      if (metadata.name === 'scoreboard_team' && data.name === 'money_value') {
+        const currentBalance = data.prefix;
+        if (currentBalance != undefined && currentBalance.trim() != '' && !currentBalance.includes('Laden')) {
+          this.emit('scoreboardBalance', currentBalance);
+        }
       }
 
       // Emit scoreboard server updates.
-      if (metadata.name === 'scoreboard_team' && data.name === 'server') {
-        this.emit('scoreboardServer', data.prefix);
+      if (metadata.name === 'scoreboard_team' && data.name === 'server_value') {
+        const serverName = data.prefix.replace(/\u00A7[0-9A-FK-OR]/gi, '');
+        if (serverName != undefined && serverName.trim() != '' && !serverName.includes('Laden')) {
+          this.emit('scoreboardServer', serverName);
+        }
       }
     });
   }
@@ -496,8 +522,7 @@ function readJsonFile(filePath: string): Promise<any> {
 }
 
 function createBot(options: Options): Bot {
-  const bot = new Bot(options);
-  return bot;
+  return new Bot(options);
 }
 
 export { createBot, Bot };

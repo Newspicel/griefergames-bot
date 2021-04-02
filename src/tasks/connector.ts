@@ -84,7 +84,7 @@ async function run(bot: Bot, options: ConnectorOptions): Promise<void> {
       throw new Error('Start position not provided! Check path file.');
   }
 
-  bot.sendCommand('portal');
+  bot.sendCommand('portal').then();
   await waitForSpawn(bot);
   await delay(3000);
 
