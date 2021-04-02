@@ -91,13 +91,12 @@ async function run(bot: Bot, options: ConnectorOptions): Promise<void> {
   listenForSpawn(bot);
 
   try {
-    await bot.client.navigate.promise.to(startPos).then().catch((error) => {console.log(error)});
+    await bot.client.navigate.promise.to(startPos);
   } catch (e) {
     if(bot.options.setPortalTimeout){
       clearTimeout(timeout);
     }
-    e.printStackTrace();
-    //throw new Error('Stuck in connector.');
+    throw new Error('Stuck in connector.');
   }
   await delay(500);
 
