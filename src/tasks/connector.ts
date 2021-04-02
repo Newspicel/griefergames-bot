@@ -65,19 +65,19 @@ async function run(bot: Bot, options: ConnectorOptions): Promise<void> {
   let lookDirection: number[];
   switch (options.start) {
     case 0: // SW
-      startPos = vec3([323, 117, 281]);
+      startPos = vec3([323, 67, 281]);
       lookDirection = [CARDINAL_YAWS.SOUTH_WEST, 0];
       break;
     case 1: // NW
-      startPos = vec3([323, 117, 279]);
+      startPos = vec3([323, 67, 279]);
       lookDirection = [CARDINAL_YAWS.NORTH_WEST, 0];
       break;
     case 2: // NE
-      startPos = vec3([327, 117, 279]);
+      startPos = vec3([327, 67, 279]);
       lookDirection = [CARDINAL_YAWS.NORTH_EAST, 0];
       break;
     case 3: // SE
-      startPos = vec3([327, 117, 281]);
+      startPos = vec3([327, 67, 281]);
       lookDirection = [CARDINAL_YAWS.SOUTH_EAST, 0];
       break;
     default:
