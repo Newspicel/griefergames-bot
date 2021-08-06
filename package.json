@@ -22,7 +22,7 @@
     "minecraft",
     "griefergames"
   ],
-  "author": "DerJP <dev@derjp.de>",
+  "author": "DerJP <dev@derjp.de>, Newspicel",
   "license": "MIT",
   "dependencies": {
     "minecraft-protocol": "git+https://github.com/Neocraftr/node-minecraft-protocol.git",
